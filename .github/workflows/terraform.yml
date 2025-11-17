@@ -58,8 +58,8 @@ jobs:
 
       - uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: ${{ steps.setup.outputs.gcp_workload_identity_provider }}
-          service_account: ${{ steps.setup.outputs.gcp_service_account }}
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
             
       - uses: suzuki-shunsuke/tfaction/test@v1.20.1
 
