@@ -1,0 +1,6 @@
+# tfaction configuration for this working directory
+# https://suzuki-shunsuke.github.io/tfaction/docs/config/tfaction-yaml
+
+# 必要に応じてカスタマイズ可能
+# terraform_command: terraform
+# terraform_version: 1.5.0
