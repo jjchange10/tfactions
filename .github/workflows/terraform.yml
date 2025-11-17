@@ -1,136 +1,36 @@
-name: test
-# tfaction workflow for Terraform
-# https://suzuki-shunsuke.github.io/tfaction/docs/
-
+name: terraform
 on:
   pull_request:
     branches:
       - main
-    types: [opened, synchronize]
-  push:
-    branches:
-      - feature/test
+
 permissions:
   id-token: write
   contents: read
   pull-requests: write
 
 jobs:
-  # Setup job to determine which working directories have changed
-  setup:
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: read
-      contents: read
-    outputs:
-      targets: ${{ steps.set-targets.outputs.targets }}
-    env:
-      AQUA_DISABLE_SLSA: "true"
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - uses: aquaproj/aqua-installer@v3.0.1
-        with:
-          aqua_version: v2.36.1
-
-      - name: List targets
-        id: list-targets
-        uses: suzuki-shunsuke/tfaction/list-targets@v1.20.1
-
-      - name: Set targets (force run for testing)
-        id: set-targets
-        run: |
-          if [ "${{ steps.list-targets.outputs.targets }}" = "[]" ]; then
-            echo 'targets=[{"target":"terraform/workload/","working_directory":"terraform/workload/"}]' >> "$GITHUB_OUTPUT"
-          else
-            echo "targets=${{ steps.list-targets.outputs.targets }}" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Debug targets output
-        run: echo "targets=${{ steps.set-targets.outputs.targets }}"
-
-  # Terraform plan job
   plan:
-    name: "plan (${{ matrix.target.target }})"
     runs-on: ubuntu-latest
-    needs: setup
-    if: needs.setup.outputs.targets != '[]'
-    permissions:
-      id-token: write
-      contents: read
-      pull-requests: write
-    strategy:
-      fail-fast: false
-      matrix:
-        target: ${{ fromJSON(needs.setup.outputs.targets) }}
+    timeout-minutes: 30
     env:
-      TFACTION_TARGET: ${{ matrix.target.target }}
+      TFACTION_TARGET: terraform/workload/
       AQUA_DISABLE_SLSA: "true"
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - uses: aquaproj/aqua-installer@v3.0.1
+      - uses: aquaproj/aqua-installer@6ce1f8848ec8e61f14d57bd5d7597057a6dd187c # v3.0.1
         with:
           aqua_version: v2.36.1
-          enable_aqua_install: true
-          aqua_opts: ""
 
-      - name: Setup tfaction
-        uses: suzuki-shunsuke/tfaction/setup@v1.20.1
+      - uses: suzuki-shunsuke/tfaction/setup@v1.20.1
         id: setup
 
-      - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@main
+      - uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ steps.setup.outputs.gcp_workload_identity_provider }}
           service_account: ${{ steps.setup.outputs.gcp_service_account }}
 
-      - name: Test
-        uses: suzuki-shunsuke/tfaction/test@v1.20.1
+      - uses: suzuki-shunsuke/tfaction/test@v1.20.1
 
-      - name: Terraform plan
-        uses: suzuki-shunsuke/tfaction/terraform-plan@v1.20.1
-
-  # Terraform apply job (only runs on main branch)
-  # Uncomment when ready to enable auto-apply
-  # apply:
-  #   name: "apply (${{ matrix.target.target }})"
-  #   runs-on: ubuntu-latest
-  #   needs: setup
-  #   if: |
-  #     github.event_name == 'push' &&
-  #     github.ref == 'refs/heads/main' &&
-  #     join(fromJSON(needs.setup.outputs.targets), '') != ''
-  #   permissions:
-  #     id-token: write
-  #     contents: read
-  #     pull-requests: write
-  #   strategy:
-  #     fail-fast: false
-  #     matrix:
-  #       target: ${{ fromJSON(needs.setup.outputs.targets) }}
-  #   env:
-  #     TFACTION_TARGET: ${{ matrix.target.target }}
-  #     AQUA_DISABLE_SLSA: "true"
-  #   steps:
-  #     - name: Checkout
-  #       uses: actions/checkout@v4
-  #
-  #     - uses: aquaproj/aqua-installer@v3.0.1
-  #       with:
-  #         aqua_version: v2.36.1
-  #
-  #     - name: Setup tfaction
-  #       uses: suzuki-shunsuke/tfaction/setup@v1.20.1
-  #       id: setup
-  #
-  #     - name: Authenticate to Google Cloud
-  #       uses: google-github-actions/auth@main
-  #       with:
-  #         workload_identity_provider: ${{ steps.setup.outputs.gcp_workload_identity_provider }}
-  #         service_account: ${{ steps.setup.outputs.gcp_service_account }}
-  #
-  #     - name: Terraform apply
-  #       uses: suzuki-shunsuke/tfaction/terraform-apply@v1.20.1
+      - uses: suzuki-shunsuke/tfaction/terraform-plan@v1.20.1
