@@ -23,7 +23,7 @@ jobs:
       pull-requests: read
       contents: read
     outputs:
-      targets: ${{ steps.list-targets.outputs.targets }}
+      targets: ${{ steps.set-targets.outputs.targets }}
     env:
       AQUA_DISABLE_SLSA: "true"
     steps:
@@ -38,8 +38,17 @@ jobs:
         id: list-targets
         uses: suzuki-shunsuke/tfaction/list-targets@v1.20.1
 
+      - name: Set targets (force run for testing)
+        id: set-targets
+        run: |
+          if [ "${{ steps.list-targets.outputs.targets }}" = "[]" ]; then
+            echo 'targets=[{"target":"terraform/workload/","working_directory":"terraform/workload/"}]' >> "$GITHUB_OUTPUT"
+          else
+            echo "targets=${{ steps.list-targets.outputs.targets }}" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Debug targets output
-        run: echo "targets=${{ steps.list-targets.outputs.targets }}"
+        run: echo "targets=${{ steps.set-targets.outputs.targets }}"
 
   # Terraform plan job
   plan:
