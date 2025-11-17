@@ -29,7 +29,7 @@ jobs:
 
       - name: List targets
         id: list-targets
-        uses: suzuki-shunsuke/tfaction/list-targets@v1
+        uses: suzuki-shunsuke/tfaction/list-targets@main
         with:
           config_path: tfaction-root.yaml
 
@@ -57,22 +57,22 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup tfaction
-        uses: suzuki-shunsuke/tfaction/setup@v1
+        uses: suzuki-shunsuke/tfaction/setup@main
         id: setup
         with:
           config_path: tfaction-root.yaml
 
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v2
+        uses: google-github-actions/auth@main
         with:
           workload_identity_provider: ${{ steps.setup.outputs.gcp_workload_identity_provider }}
           service_account: ${{ steps.setup.outputs.gcp_service_account }}
 
       - name: Test
-        uses: suzuki-shunsuke/tfaction/test@v1
+        uses: suzuki-shunsuke/tfaction/test@main
 
       - name: Terraform plan
-        uses: suzuki-shunsuke/tfaction/terraform-plan@v1
+        uses: suzuki-shunsuke/tfaction/terraform-plan@main
 
   # # Terraform apply job (only runs on main branch)
   # apply:
