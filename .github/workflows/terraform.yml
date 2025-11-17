@@ -1,0 +1,116 @@
+name: test
+# tfaction workflow for Terraform
+# https://suzuki-shunsuke.github.io/tfaction/docs/
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  # Setup job to determine which working directories have changed
+  setup:
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read
+    outputs:
+      working_directories: ${{ steps.list-targets.outputs.working_directories }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: List targets
+        id: list-targets
+        uses: suzuki-shunsuke/tfaction/list-targets@v1
+        with:
+          config_path: tfaction-root.yaml
+
+  # Terraform plan job
+  plan:
+    name: "plan (${{ matrix.working_directory }})"
+    runs-on: ${{ matrix.runs_on }}
+    needs: setup
+    if: needs.setup.outputs.working_directories != '[]'
+    permissions:
+      id-token: write
+      contents: read
+      pull-requests: write
+    strategy:
+      fail-fast: false
+      matrix:
+        working_directory: ${{ fromJSON(needs.setup.outputs.working_directories) }}
+        include:
+          - working_directory: terraform/workload/
+            runs_on: ubuntu-latest
+    env:
+      TFACTION_TARGET: ${{ matrix.working_directory }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup tfaction
+        uses: suzuki-shunsuke/tfaction/setup@v1
+        id: setup
+        with:
+          config_path: tfaction-root.yaml
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ steps.setup.outputs.gcp_workload_identity_provider }}
+          service_account: ${{ steps.setup.outputs.gcp_service_account }}
+
+      - name: Test
+        uses: suzuki-shunsuke/tfaction/test@v1
+
+      - name: Terraform plan
+        uses: suzuki-shunsuke/tfaction/terraform-plan@v1
+
+  # # Terraform apply job (only runs on main branch)
+  # apply:
+  #   name: "apply (${{ matrix.working_directory }})"
+  #   runs-on: ${{ matrix.runs_on }}
+  #   needs: setup
+  #   if: |
+  #     github.event_name == 'push' &&
+  #     github.ref == 'refs/heads/main' &&
+  #     needs.setup.outputs.working_directories != '[]'
+  #   permissions:
+  #     id-token: write
+  #     contents: read
+  #     pull-requests: write
+  #   strategy:
+  #     fail-fast: false
+  #     matrix:
+  #       working_directory: ${{ fromJSON(needs.setup.outputs.working_directories) }}
+  #       include:
+  #         - working_directory: terraform/workload/
+  #           runs_on: ubuntu-latest
+  #   env:
+  #     TFACTION_TARGET: ${{ matrix.working_directory }}
+  #   steps:
+  #     - name: Checkout
+  #       uses: actions/checkout@v4
+
+  #     - name: Setup tfaction
+  #       uses: suzuki-shunsuke/tfaction/setup@v1
+  #       id: setup
+  #       with:
+  #         config_path: tfaction-root.yaml
+
+  #     - name: Authenticate to Google Cloud
+  #       uses: google-github-actions/auth@v2
+  #       with:
+  #         workload_identity_provider: ${{ steps.setup.outputs.gcp_workload_identity_provider }}
+  #         service_account: ${{ steps.setup.outputs.gcp_service_account }}
+
+  #     - name: Terraform apply
+  #       uses: suzuki-shunsuke/tfaction/terraform-apply@v1
