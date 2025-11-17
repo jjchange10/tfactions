@@ -3,9 +3,6 @@ registries:
     ref: v4.434.0
 
 packages:
-  - name: suzuki-shunsuke/github-comment
+  - name: "*"
     registry: standard
-    slsa_verifier:
-      enabled: false
-    cosign:
-      enabled: false
+    version: "*"
