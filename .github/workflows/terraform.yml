@@ -32,7 +32,7 @@ jobs:
 
       - name: List targets
         id: list-targets
-        uses: suzuki-shunsuke/tfaction/list-targets@main
+        uses: suzuki-shunsuke/tfaction/list-targets@v1
         with:
           config_path: tfaction-root.yaml
 
@@ -67,7 +67,7 @@ jobs:
           aqua_opts: ""
 
       - name: Setup tfaction
-        uses: suzuki-shunsuke/tfaction/setup@main
+        uses: suzuki-shunsuke/tfaction/setup@v1
         id: setup
         with:
           config_path: tfaction-root.yaml
@@ -79,10 +79,10 @@ jobs:
           service_account: ${{ steps.setup.outputs.gcp_service_account }}
 
       - name: Test
-        uses: suzuki-shunsuke/tfaction/test@main
+        uses: suzuki-shunsuke/tfaction/test@v1
 
       - name: Terraform plan
-        uses: suzuki-shunsuke/tfaction/terraform-plan@main
+        uses: suzuki-shunsuke/tfaction/terraform-plan@v1
 
   # # Terraform apply job (only runs on main branch)
   # apply:
