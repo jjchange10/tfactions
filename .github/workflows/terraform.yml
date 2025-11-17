@@ -27,9 +27,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - uses: aquaproj/aqua-installer@v2.2.0
+      - uses: aquaproj/aqua-installer@v3.0.1
         with:
-          aqua_version: v2.21.0
+          aqua_version: v2.36.1
+          enable_aqua_install: true
+          aqua_opts: ""
 
       - name: List targets
         id: list-targets
@@ -59,6 +61,12 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - uses: aquaproj/aqua-installer@v3.0.1
+        with:
+          aqua_version: v2.36.1
+          enable_aqua_install: true
+          aqua_opts: ""
 
       - name: Setup tfaction
         uses: suzuki-shunsuke/tfaction/setup@main
