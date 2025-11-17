@@ -9,4 +9,3 @@ registries:
 
 packages:
   - name: suzuki-shunsuke/github-comment@v6.3.5
-  - name: wget/wget@v1.22.1
