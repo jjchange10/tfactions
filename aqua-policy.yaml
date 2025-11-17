@@ -1,0 +1,6 @@
+packages:
+  - name: suzuki-shunsuke/github-comment
+    slsa_verifier:
+      enabled: false
+    cosign:
+      enabled: false
