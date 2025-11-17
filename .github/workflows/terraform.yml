@@ -51,15 +51,15 @@ jobs:
         env:
           AQUA_DISABLE_SLSA: "true"
 
-      # terraform init などの準備を行う Action
-      - uses: suzuki-shunsuke/tfaction/setup@v1.20.1
-        id: setup
-
       - uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: ${{ steps.setup.outputs.gcp_workload_identity_provider }}
           service_account: ${{ steps.setup.outputs.gcp_service_account }}
 
+      # terraform init などの準備を行う Action
+      - uses: suzuki-shunsuke/tfaction/setup@v1.20.1
+        id: setup
+            
       - uses: suzuki-shunsuke/tfaction/test@v1.20.1
 
       # terraform plan を実行する Action
