@@ -2,8 +2,8 @@
 plan_workflow_name: terraform
 
 target_groups:
-  - working_directory: terraform/workload/
-    target: terraform/workload/
+  - working_directory: terraform/workload
+    target: terraform/workload
     terraform_plan_config:
       gcp_service_account: terraform-plan@kose-fleet-test.iam.gserviceaccount.com
       gcp_workload_identity_provider: 'projects/755125639605/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
