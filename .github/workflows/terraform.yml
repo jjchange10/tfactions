@@ -18,8 +18,9 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read
+      contents: read
     outputs:
-      working_directories: ${{ steps.list-targets.outputs.working_directories }}
+      targets: ${{ steps.list-targets.outputs.targets }}
     env:
       AQUA_DISABLE_SLSA: "true"
     steps:
@@ -33,15 +34,13 @@ jobs:
       - name: List targets
         id: list-targets
         uses: suzuki-shunsuke/tfaction/list-targets@v1.20.1
-        with:
-          config_path: tfaction-root.yaml
 
   # Terraform plan job
   plan:
-    name: "plan (${{ matrix.working_directory }})"
-    runs-on: ${{ matrix.runs_on }}
+    name: "plan (${{ matrix.target.target }})"
+    runs-on: ubuntu-latest
     needs: setup
-    if: needs.setup.outputs.working_directories != '[]'
+    if: join(fromJSON(needs.setup.outputs.targets), '') != ''
     permissions:
       id-token: write
       contents: read
@@ -49,12 +48,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        working_directory: ${{ fromJSON(needs.setup.outputs.working_directories) }}
-        include:
-          - working_directory: terraform/workload/
-            runs_on: ubuntu-latest
+        target: ${{ fromJSON(needs.setup.outputs.targets) }}
     env:
-      TFACTION_TARGET: ${{ matrix.working_directory }}
+      TFACTION_TARGET: ${{ matrix.target.target }}
       AQUA_DISABLE_SLSA: "true"
     steps:
       - name: Checkout
@@ -69,8 +65,6 @@ jobs:
       - name: Setup tfaction
         uses: suzuki-shunsuke/tfaction/setup@v1.20.1
         id: setup
-        with:
-          config_path: tfaction-root.yaml
 
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@main
@@ -84,15 +78,16 @@ jobs:
       - name: Terraform plan
         uses: suzuki-shunsuke/tfaction/terraform-plan@v1.20.1
 
-  # # Terraform apply job (only runs on main branch)
+  # Terraform apply job (only runs on main branch)
+  # Uncomment when ready to enable auto-apply
   # apply:
-  #   name: "apply (${{ matrix.working_directory }})"
-  #   runs-on: ${{ matrix.runs_on }}
+  #   name: "apply (${{ matrix.target.target }})"
+  #   runs-on: ubuntu-latest
   #   needs: setup
   #   if: |
   #     github.event_name == 'push' &&
   #     github.ref == 'refs/heads/main' &&
-  #     needs.setup.outputs.working_directories != '[]'
+  #     join(fromJSON(needs.setup.outputs.targets), '') != ''
   #   permissions:
   #     id-token: write
   #     contents: read
@@ -100,27 +95,27 @@ jobs:
   #   strategy:
   #     fail-fast: false
   #     matrix:
-  #       working_directory: ${{ fromJSON(needs.setup.outputs.working_directories) }}
-  #       include:
-  #         - working_directory: terraform/workload/
-  #           runs_on: ubuntu-latest
+  #       target: ${{ fromJSON(needs.setup.outputs.targets) }}
   #   env:
-  #     TFACTION_TARGET: ${{ matrix.working_directory }}
+  #     TFACTION_TARGET: ${{ matrix.target.target }}
+  #     AQUA_DISABLE_SLSA: "true"
   #   steps:
   #     - name: Checkout
   #       uses: actions/checkout@v4
-
-  #     - name: Setup tfaction
-  #       uses: suzuki-shunsuke/tfaction/setup@v1
-  #       id: setup
+  #
+  #     - uses: aquaproj/aqua-installer@v3.0.1
   #       with:
-  #         config_path: tfaction-root.yaml
-
+  #         aqua_version: v2.36.1
+  #
+  #     - name: Setup tfaction
+  #       uses: suzuki-shunsuke/tfaction/setup@v1.20.1
+  #       id: setup
+  #
   #     - name: Authenticate to Google Cloud
-  #       uses: google-github-actions/auth@v2
+  #       uses: google-github-actions/auth@main
   #       with:
   #         workload_identity_provider: ${{ steps.setup.outputs.gcp_workload_identity_provider }}
   #         service_account: ${{ steps.setup.outputs.gcp_service_account }}
-
+  #
   #     - name: Terraform apply
-  #       uses: suzuki-shunsuke/tfaction/terraform-apply@v1
+  #       uses: suzuki-shunsuke/tfaction/terraform-apply@v1.20.1
