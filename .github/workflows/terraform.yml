@@ -14,6 +14,8 @@ jobs:
   setup:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      AQUA_DISABLE_SLSA: "true"
     outputs:
       targets: ${{ steps.list-targets.outputs.targets }}
     steps:
