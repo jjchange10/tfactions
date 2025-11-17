@@ -8,18 +8,7 @@ registries:
 
 
 packages:
-  - import: imports/*.yaml
-  - name: suzuki-shunsuke/tfaction-go@v0.2.3
-
-# packages:
-#   - name: suzuki-shunsuke/github-comment@v6.3.5
-#     # SLSA検証をスキップ（互換性の問題を回避）
-#     no_link: false
-#     cosign: false
-#     slsa_verifier: false
-
-# # SLSA検証をグローバルに無効化
-# checksum:
-#   enabled: false
-# slsa_verifier:
-#   enabled: false
+  - name: suzuki-shunsuke/github-comment@v6.0.3
+  - name: suzuki-shunsuke/ci-info@v2.1.3
+  - name: int128/ghcp@v1.13.2
+  - name: suzuki-shunsuke/tfcmt@v4.7.2
