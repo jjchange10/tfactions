@@ -27,3 +27,42 @@ jobs:
 
       - uses: suzuki-shunsuke/tfaction/list-targets@v1.20.1
         id: list-targets
+  plan:
+    name: "terraform plan (${{ matrix.target.target }})"
+    runs-on: ${{ matrix.target.runs_on }}
+    needs: setup
+
+    # setup で取得した変更のある作業ディレクトリが空の場合は実行しない
+    if: join(fromJSON(needs.setup.outputs.targets), '') != ''
+
+    strategy:
+      fail-fast: false
+      matrix:
+        target: ${{ fromJSON(needs.setup.outputs.targets) }}
+    env:
+      TFACTION_TARGET: ${{ matrix.target.target }}
+      TFACTION_JOB_TYPE: terraform
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: aquaproj/aqua-installer@6ce1f8848ec8e61f14d57bd5d7597057a6dd187c # v3.0.1
+        with:
+          aqua_version: v2.36.1
+        env:
+          AQUA_DISABLE_SLSA: "true"
+
+      # terraform init などの準備を行う Action
+      - uses: suzuki-shunsuke/tfaction/setup@v1.20.1
+        id: setup
+
+      - uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ steps.setup.outputs.gcp_workload_identity_provider }}
+          service_account: ${{ steps.setup.outputs.gcp_service_account }}
+
+      - uses: suzuki-shunsuke/tfaction/test@v1.20.1
+
+      # terraform plan を実行する Action
+      - uses: suzuki-shunsuke/tfaction/terraform-plan@v1.20.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
