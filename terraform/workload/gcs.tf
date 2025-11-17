@@ -1,3 +1,4 @@
+# # GCS bucket for storing data
 # resource "google_storage_bucket" "main" {
 #   name          = "${var.base_project_id}-bucket"
 #   project       = var.base_project_id

@@ -36,7 +36,7 @@ locals {
       description  = "Service Account for terraform plan operations"
       roles = [
         "roles/viewer",                    # リソースの読み取り
-        "roles/storage.objectViewer",      # tfstate読み取り
+        "roles/storage.objectAdmin",       # tfstate読み書き（lockファイル作成に必要）
       ]
     }
     terraform-apply = {
