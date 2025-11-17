@@ -21,8 +21,7 @@ jobs:
     outputs:
       working_directories: ${{ steps.list-targets.outputs.working_directories }}
     env:
-      AQUA_POLICY_CONFIG: ${{ github.workspace }}/aqua-policy.yaml
-      AQUA_DISABLE_SLSA_VERIFICATION: "true"
+      AQUA_DISABLE_SLSA: "true"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -30,7 +29,6 @@ jobs:
       - uses: aquaproj/aqua-installer@v3.0.1
         with:
           aqua_version: v2.36.1
-          policy_allow: true
 
       - name: List targets
         id: list-targets
@@ -57,8 +55,7 @@ jobs:
             runs_on: ubuntu-latest
     env:
       TFACTION_TARGET: ${{ matrix.working_directory }}
-      AQUA_POLICY_CONFIG: ${{ github.workspace }}/aqua-policy.yaml
-      AQUA_DISABLE_SLSA_VERIFICATION: "true"
+      AQUA_DISABLE_SLSA: "true"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -66,7 +63,6 @@ jobs:
       - uses: aquaproj/aqua-installer@v3.0.1
         with:
           aqua_version: v2.36.1
-          policy_allow: true
           enable_aqua_install: true
           aqua_opts: ""
 

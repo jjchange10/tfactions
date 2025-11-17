@@ -1,8 +1,0 @@
-registries:
-  - type: standard
-    ref: v4.434.0
-
-packages:
-  - name: "*"
-    registry: standard
-    version: "*"
