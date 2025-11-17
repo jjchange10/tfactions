@@ -1,5 +1,5 @@
 ---
-plan_workflow_name: test
+plan_workflow_name: terraform
 
 target_groups:
   - working_directory: terraform/workload/
