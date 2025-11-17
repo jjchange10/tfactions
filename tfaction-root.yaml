@@ -1,38 +1,12 @@
 ---
 plan_workflow_name: test
 
-draft_pr: false
-base_working_directory: ""
-working_directory_file: tfaction.yaml
-
-terraform_command: terraform
-
 target_groups:
-- working_directory: terraform/workload/
-  target: terraform/workload/**
-
-  runs_on: ubuntu-latest
-
-  # tfmigrate履歴用のGCSバケット（オプション）
-  # gcs_bucket_name_tfmigrate_history: 'tfmigrate-history-bucket'
-
-  # Terraform Backend用のサービスアカウント（オプション）
-  # 指定しない場合、terraform_plan_config/terraform_apply_configの値が使用されます
-  # gcp_remote_backend_service_account: terraform-apply@kose-fleet-test.iam.gserviceaccount.com
-  # gcp_remote_backend_workload_identity_provider: 'projects/755125639605/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
-
-  terraform_plan_config:
-    gcp_service_account: terraform-plan@kose-fleet-test.iam.gserviceaccount.com
-    gcp_workload_identity_provider: 'projects/755125639605/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
-
-  tfmigrate_plan_config:
-    gcp_service_account: tfmigrate-plan@kose-fleet-test.iam.gserviceaccount.com
-    gcp_workload_identity_provider: 'projects/755125639605/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
-
-  terraform_apply_config:
-    gcp_service_account: terraform-apply@kose-fleet-test.iam.gserviceaccount.com
-    gcp_workload_identity_provider: 'projects/755125639605/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
-
-  tfmigrate_apply_config:
-    gcp_service_account: tfmigrate-apply@kose-fleet-test.iam.gserviceaccount.com
-    gcp_workload_identity_provider: 'projects/755125639605/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+  - working_directory: terraform/workload/
+    target: terraform/workload/**
+    terraform_plan_config:
+      gcp_service_account: terraform-plan@kose-fleet-test.iam.gserviceaccount.com
+      gcp_workload_identity_provider: 'projects/755125639605/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
+    terraform_apply_config:
+      gcp_service_account: terraform-apply@kose-fleet-test.iam.gserviceaccount.com
+      gcp_workload_identity_provider: 'projects/755125639605/locations/global/workloadIdentityPools/github-pool/providers/github-provider'
