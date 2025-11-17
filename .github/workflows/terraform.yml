@@ -60,8 +60,6 @@ jobs:
         with:
           workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
-            
-      - uses: suzuki-shunsuke/tfaction/test@v1.20.1
 
       # terraform plan を実行する Action
       - uses: suzuki-shunsuke/tfaction/terraform-plan@v1.20.1
