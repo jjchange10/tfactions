@@ -2,15 +2,15 @@ registries:
   - type: standard
     ref: v4.434.0 # renovate: depName=aquaproj/aqua-registry
 
-packages:
-  - name: suzuki-shunsuke/github-comment@v6.3.5
-    # SLSA検証をスキップ（互換性の問題を回避）
-    no_link: false
-    cosign: false
-    slsa_verifier: false
+# packages:
+#   - name: suzuki-shunsuke/github-comment@v6.3.5
+#     # SLSA検証をスキップ（互換性の問題を回避）
+#     no_link: false
+#     cosign: false
+#     slsa_verifier: false
 
-# SLSA検証をグローバルに無効化
-checksum:
-  enabled: false
-slsa_verifier:
-  enabled: false
+# # SLSA検証をグローバルに無効化
+# checksum:
+#   enabled: false
+# slsa_verifier:
+#   enabled: false
