@@ -38,6 +38,9 @@ jobs:
         id: list-targets
         uses: suzuki-shunsuke/tfaction/list-targets@v1.20.1
 
+      - name: Debug targets output
+        run: echo "targets=${{ steps.list-targets.outputs.targets }}"
+
   # Terraform plan job
   plan:
     name: "plan (${{ matrix.target.target }})"
